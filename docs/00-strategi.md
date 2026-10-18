@@ -8,6 +8,8 @@
 - Password di sheet `Users` tersimpan **plaintext**; API key AI (Gemini, Qwen, DeepSeek, Claude, …) tersimpan di sheet `PengaturanSekolah`.
 - Batas Apps Script (waktu eksekusi 6 menit, kuota harian, 1 spreadsheet) membatasi jumlah siswa, analisis, dan pembuatan soal massal.
 - Control Center masih berupa 15 sheet terpisah yang disambung rumus.
+- Fitur yang sudah matang dan dipakai guru setiap hari: penilaian **STNKM double-layer**, jurnal anekdotal dengan AI + heuristik offline, laporan tren STNKM mingguan, P5 otomatis, Early Warning System, notifikasi WhatsApp, import Excel, audit trail (detail: `06-spesifikasi-edurapor.md`).
+- Ditemukan bug pembaruan nilai yang menimpa baris siswa lain, serta dua cabang kode (Drive vs GitHub) dengan fitur dan perbaikan keamanan yang berbeda.
 
 **Imajinasi**: satu platform sekolah di mana guru cukup menyusun ATP sekali, lalu Prota, Promes, silabus, KKTP, modul ajar, jurnal, soal, analisis butir, dan rapor mengalir otomatis; pimpinan melihat kesehatan seluruh program sekolah dalam satu layar; data aman dan bisa dipakai banyak sekolah dalam satu yayasan.
 
@@ -82,10 +84,10 @@ Mitigasi kekurangan opsi D: kontrak antar-service sempit (hanya 2 jalur: JWT kel
 |---|---|---|
 | **1. Fondasi** | Arsitektur, auth, tenant, Setup Sekolah, Tahun Ajaran, Pegawai, Master Bidang & PIC, gateway → Django, generator soal (backend), analisis butir (backend) | ✅ repo ini |
 | 2. Control Center | Program, KPI & target, milestone (RAG otomatis), delegasi RACI, realisasi, evidence, issue/eskalasi, rapat-keputusan-tindak lanjut, Dashboard Pimpinan, generator dokumen | ⏳ |
-| 3. Kurikulum & LMS | Siswa, kelas, mapel, CP/TP/ATP, kalender akademik, Prota/Promes/Silabus otomatis, KKTP, Modul Ajar + LKPD, presensi & jurnal, PWA offline | ⏳ |
-| 4. Asesmen & Rapor | UI generator + telaah soal, ekspor kisi-kisi/kartu soal/naskah (PDF/DOCX/XLSX), Tryout TKA, nilai per TP, rapor + deskripsi otomatis | ⏳ |
+| 3. Kurikulum & LMS | Siswa + orang tua (kontak WA, opt-in), kelas, mapel, CP/TP/ATP, kalender akademik & minggu efektif, jadwal berulang, Prota/Promes/Silabus otomatis, KKTP, Modul Ajar + LKPD, presensi H/S/I/A, **jurnal anekdotal STNKM** (AI + kamus heuristik), notifikasi WhatsApp, PWA offline | ⏳ |
+| 4. Asesmen & Rapor | Nilai per TP dengan **STNKM double-layer** (auto/manual), import Excel, laporan tren STNKM mingguan, dashboard akademik + **Early Warning System**, P5/kokurikuler, rapor format 2025 + catatan wali kelas AI, UI generator + telaah soal, ekspor kisi-kisi/kartu soal/naskah, Tryout TKA | ⏳ |
 | 5. ERP | Inventaris, keuangan & PR (alur persetujuan), EB → EK | ⏳ |
-| 6. Migrasi & cut-over | ETL sheet → Postgres, verifikasi paralel 1 bulan, reset password massal, matikan Apps Script | ⏳ |
+| 6. Migrasi & cut-over | ETL sheet → Postgres (normalisasi tanggal & kode presensi, pemetaan `id_guru`, deteksi `id_nilai` ganda), pindah lampiran Drive → storage privat, verifikasi paralel 1 bulan, reset password massal, cabut API key/token lama, matikan Apps Script | ⏳ |
 
 **TDU — Tes dan Ukur**
 

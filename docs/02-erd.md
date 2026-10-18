@@ -285,8 +285,93 @@ erDiagram
 | `TransLogAktivitas` | `activity_logs` | |
 | `MasterSiswa`, `MasterOrtu`, `MasterWali`, `MasterWilayah`, ... | `students`, `guardians`, referensi wilayah Kemendagri | |
 | `MasterKelas`, `MasterMapel` | `classrooms`, `subjects`, `teaching_assignments` | |
-| `MasterMateri` (+ matriks STNKM) | `learning_objectives` + `objective_dimension_weights` | Matriks S-T-N-K-M dipertahankan sebagai bobot dimensi per TP. |
-| `TransNilai`, `RekapRaporAkhir` | `objective_scores`, `report_cards` | |
-| `TransPresensi`, `TransJurnal`, `TransJadwal` | `attendances`, `teaching_journals`, `class_sessions` | |
+| `MasterMateri` (+ matriks STNKM), `MasterMBK` (+ matriks STNKM) | `learning_objectives`, `assessment_types` + `dimension_weights` | Matriks S-T-N-K-M dipertahankan sebagai bobot dimensi (lihat bagian G). |
+| `TransNilai`, `RekapRaporAkhir` | `objective_scores` (+ `points_s..m`, `scoring_method`), `report_cards` | Periksa `id_nilai` ganda akibat bug pembaruan baris (06 §5.3). |
+| `TransPresensi` | `attendances` | Normalisasi kode H/S/I/A. |
+| `TransJurnal` (jurnal anekdotal) | `observations`, `observation_attachments` | Lampiran dipindah dari Drive publik ke penyimpanan privat. |
+| `TransJadwal` | `schedule_series`, `class_sessions` | `id_group` → seri jadwal. |
+| `MasterBankPengetahuan` | `knowledge_assets` | |
+| `HEURISTIK_DICT` (hardcoded di `jurnal.html`) | `nlp_lexicon` | Dikelola admin dari UI. |
+| `PengaturanSekolah` (WA: `status_wa_api`, `wa_api_token`, `no_wa_kepsek`, `id_wa_group_guru`) | `schools.settings` + secret terenkripsi | Token tidak disimpan polos. |
 | `MasterProyek`, `MasterTargetP5`, `TransNilaiP5`, `TransCatatanP5` | `projects`, `project_targets`, `project_scores` | |
 | `TransCatatanWali` | `report_cards.homeroom_note` | |
+
+## G. Tambahan dari sistem lama: STNKM, Jurnal, P5, Rapor, Notifikasi (⏳)
+
+Rinciannya ada di [`06-spesifikasi-edurapor.md`](06-spesifikasi-edurapor.md).
+
+```mermaid
+erDiagram
+    ASSESSMENT_TYPES ||--o| DIMENSION_WEIGHTS : "bobot STNKM jenis"
+    LEARNING_OBJECTIVES ||--o| DIMENSION_WEIGHTS : "bobot STNKM materi/TP"
+    ASSESSMENT_TYPES ||--o{ OBJECTIVE_SCORES : "jenis"
+    STUDENTS ||--o{ OBSERVATIONS : "jurnal anekdotal"
+    EMPLOYEES ||--o{ OBSERVATIONS : "pelapor"
+    OBSERVATIONS ||--o{ OBSERVATION_ATTACHMENTS : "bukti"
+    NLP_LEXICON }o--|| SCHOOLS : "kamus heuristik"
+    PROJECTS ||--|{ PROJECT_TARGETS : "target P5"
+    PROJECT_TARGETS ||--|{ PROJECT_TARGET_DIMENSIONS : "relasi STNKM"
+    PROJECT_TARGETS ||--o{ PROJECT_SCORES : "predikat SB/BSH/MB/BB"
+    STUDENTS ||--o{ PROJECT_SCORES : ""
+    REPORT_CARDS ||--o{ REPORT_CARD_EXTRACURRICULARS : ""
+    REPORT_CARDS ||--o| REPORT_CARD_ATTENDANCE_SUMMARY : "S/I/A"
+    STUDENTS ||--o{ STUDENT_RISK_FLAGS : "EWS"
+    EWS_RULES ||--o{ STUDENT_RISK_FLAGS : "aturan"
+    STUDENTS ||--o{ GUARDIAN_CONTACTS : "orang tua/wali"
+    GUARDIAN_CONTACTS ||--o{ NOTIFICATION_LOGS : "WA"
+    SCHEDULE_SERIES ||--|{ CLASS_SESSIONS : "sesi berulang"
+    ROOMS ||--o{ CLASS_SESSIONS : ""
+
+    DIMENSION_WEIGHTS {
+        ulid id PK
+        string weightable_type
+        ulid weightable_id
+        decimal s "default 1.0"
+        decimal t
+        decimal n
+        decimal k
+        decimal m
+    }
+    OBJECTIVE_SCORES {
+        ulid id PK
+        decimal raw_score "null = tidak dinilai, bukan 0"
+        decimal points_s
+        decimal points_t
+        decimal points_n
+        decimal points_k
+        decimal points_m
+        string scoring_method "auto/manual"
+    }
+    OBSERVATIONS {
+        ulid id PK
+        date observed_on
+        text narrative
+        jsonb ai_scores "skor usulan AI/heuristik"
+        jsonb final_scores "skor setelah koreksi guru, -5..+5"
+        string score_source "ai/heuristic/manual"
+        string impact_mode "bonus/separate"
+    }
+    NLP_LEXICON {
+        ulid id PK
+        string phrase
+        decimal s
+        decimal t
+        decimal n
+        decimal k
+        decimal m
+    }
+    GUARDIAN_CONTACTS {
+        ulid id PK
+        string relation "ayah/ibu/wali"
+        string whatsapp
+        bool wa_opt_in
+    }
+    STUDENT_RISK_FLAGS {
+        ulid id PK
+        string category "akademik/presensi/karakter"
+        tinyint level "1 waspada, 2 perhatian, 3 bahaya"
+        text reason
+        date detected_on
+    }
+```
+

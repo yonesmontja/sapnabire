@@ -84,6 +84,25 @@ Base URL: `/api/v1`. Semua respons JSON. Autentikasi `Authorization: Bearer <tok
 | POST | `/report-cards/generate` — deskripsi rapor otomatis (job) | ⏳ |
 | GET | `/report-cards/{student}/{semester}` (+ `?format=pdf`) | ⏳ |
 
+### Dari sistem lama (EduRapor) — lihat `06-spesifikasi-edurapor.md`
+| Method | Endpoint | Status |
+|---|---|---|
+| CRUD | `/academic/assessment-types` (+ bobot STNKM), `/academic/dimension-weights/{type}/{id}` | ⏳ |
+| PUT | `/grades/batch` — simpan nilai satu kelas (nilai kosong dilewati, poin STNKM dihitung server) | ⏳ |
+| POST | `/grades/imports` (preview → `/grades/imports/{id}/commit`) — mode `auto`/`manual` | ⏳ |
+| POST | `/grades/stnkm/recalculate?semester_id=` — hanya baris `auto` | ⏳ |
+| GET | `/reports/stnkm?classroom_id=&semester_id=&week_mode=academic|iso&start_date=&from_week=&to_week=` (+ `?format=xlsx|csv|pdf`) | ⏳ |
+| CRUD | `/observations` (jurnal anekdotal, multipart lampiran) | ⏳ |
+| POST | `/observations/score` → Django `POST /v1/observations/score` (AI); fallback heuristik `nlp_lexicon` | ⏳ |
+| CRUD | `/settings/nlp-lexicon` | ⏳ |
+| CRUD | `/p5/projects`, `/p5/projects/{id}/targets`; POST `/p5/projects/{id}/calculate` | ⏳ |
+| POST | `/report-cards/{student}/{semester}/homeroom-note/draft` → Django (AI dari jurnal) | ⏳ |
+| GET | `/dashboard/academic` (KPI, radar STNKM, korelasi, tren), `/dashboard/early-warning` | ⏳ |
+| CRUD | `/schedules` + `PATCH/DELETE /schedules/{id}?scope=this|following|all` | ⏳ |
+| GET/PUT | `/settings/notifications` (gateway WA, grup guru); POST `/notifications/whatsapp/preview|send` | ⏳ |
+| CRUD | `/knowledge-assets` (Bank Pengetahuan Kurikulum) | ⏳ |
+| GET | `/audit/activity-logs` (+ KPI, ekspor) | ⏳ |
+
 ### Logistik, Keuangan & HR
 | Method | Endpoint | Status |
 |---|---|---|

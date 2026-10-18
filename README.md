@@ -21,6 +21,7 @@ Migrasi **EduRapor (Google Apps Script, repo `yonesmontja/sap`)** ke arsitektur 
 | 03 | [API Gateway](docs/03-api-gateway.md) | Konvensi & daftar endpoint v1 (status ✅/⏳) |
 | 04 | [Integrasi AI Soal](docs/04-integrasi-ai-soal.md) | Sequence Laravel ↔ Django ↔ Claude, kontrak API, keputusan desain |
 | 05 | [Setup Lokal](docs/05-setup-lokal.md) | Instalasi langkah demi langkah 3 environment |
+| 06 | [Spesifikasi dari EduRapor](docs/06-spesifikasi-edurapor.md) | Aturan bisnis sistem lama (STNKM, jurnal, P5, rapor, EWS, WA, import), peta halaman → modul, risiko & bug untuk migrasi |
 
 ## Struktur repositori
 
